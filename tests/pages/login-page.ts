@@ -22,7 +22,7 @@ export class LoginPage {
     await this.page.goto(this.url)
   }
 
-  async authorize(userName:string,password:string) {
+  async authorize(userName: string, password: string) {
     await this.usernameField.fill(userName)
     await this.passwordField.fill(password)
     await this.signIn.click()

@@ -4,9 +4,8 @@ import { fakeJwt } from '../../utils/jwt-generator'
 import { LoginPage } from '../../pages/login-page'
 import { OrderPage } from '../../pages/order-page'
 
-
 test('Sign in flow with mock', async ({ page }) => {
-  const loginPage = new LoginPage(page);
+  const loginPage = new LoginPage(page)
   const jwt = fakeJwt()
 
   await page.route('**/login/student', async (route) => {
@@ -18,25 +17,25 @@ test('Sign in flow with mock', async ({ page }) => {
   })
 
   await page.goto(SERVICE_URL)
-  await loginPage.authorize('12345678','qwertyui');
+  await loginPage.authorize('12345678', 'qwertyui')
   await expect(page.getByTestId('openStatusPopup-button')).toBeVisible()
 })
 
 test('Sign in flow with negative mock', async ({ page }) => {
-  const loginPage = new LoginPage(page);
+  const loginPage = new LoginPage(page)
   await page.route('**/login/student', async (route) => {
     await route.fulfill({
       status: 401,
     })
   })
   await page.goto(SERVICE_URL)
-  await loginPage.authorize('12345678','qwertyui');
+  await loginPage.authorize('12345678', 'qwertyui')
   await expect(loginPage.authorizationError).toBeVisible()
 })
 
 test('Sign in flow and create an order with mock', async ({ page }) => {
-  const loginPage = new LoginPage(page);
-  const orderPage = new OrderPage(page);
+  const loginPage = new LoginPage(page)
+  const orderPage = new OrderPage(page)
   const jwt = fakeJwt()
   await page.route('**/login/student', async (route) => {
     await route.fulfill({
@@ -63,17 +62,15 @@ test('Sign in flow and create an order with mock', async ({ page }) => {
   })
 
   await page.goto(SERVICE_URL)
-  await loginPage.authorize('12345678','qwertyui');
+  await loginPage.authorize('12345678', 'qwertyui')
   await expect(page.getByTestId('openStatusPopup-button')).toBeVisible()
-  await orderPage.orderCreate('moh','3321312','123')
-});
-
-
+  await orderPage.orderCreate('moh', '3321312', '123')
+})
 
 test('Sign in flow and get order by id with mock', async ({ page }) => {
   const jwt = fakeJwt()
-  const loginPage = new LoginPage(page);
-  const orderPage = new OrderPage(page);
+  const loginPage = new LoginPage(page)
+  const orderPage = new OrderPage(page)
   await page.route('**/login/student', async (route) => {
     await route.fulfill({
       // body not a json but a plain text
@@ -99,15 +96,14 @@ test('Sign in flow and get order by id with mock', async ({ page }) => {
   })
 
   await page.goto(SERVICE_URL)
-  await loginPage.authorize('12345678','qwertyui');
- await orderPage.searchOrder('888');
-   });
-
+  await loginPage.authorize('12345678', 'qwertyui')
+  await orderPage.searchOrder('888')
+})
 
 test('Sign in flow and get accepted order by id with mock', async ({ page }) => {
   const jwt = fakeJwt()
-  const loginPage = new LoginPage(page);
-  const orderPage = new OrderPage(page);
+  const loginPage = new LoginPage(page)
+  const orderPage = new OrderPage(page)
   await page.route('**/login/student', async (route) => {
     await route.fulfill({
       // body not a json but a plain text
@@ -133,6 +129,6 @@ test('Sign in flow and get accepted order by id with mock', async ({ page }) => 
   })
 
   await page.goto(SERVICE_URL)
-  await loginPage.authorize('12345678','qwertyui');
- await orderPage.searchOrder('888');
-});
+  await loginPage.authorize('12345678', 'qwertyui')
+  await orderPage.searchOrder('888')
+})
