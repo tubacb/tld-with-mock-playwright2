@@ -1,8 +1,12 @@
 import { expect, test } from '@playwright/test'
 import { SERVICE_URL } from '../../../config/env-data'
 import { fakeJwt } from '../../utils/jwt-generator'
+import { LoginPage } from '../../pages/login-page'
+import { OrderPage } from '../../pages/order-page'
+
 
 test('Sign in flow with mock', async ({ page }) => {
+  const loginPage = new LoginPage(page);
   const jwt = fakeJwt()
 
   await page.route('**/login/student', async (route) => {
@@ -14,35 +18,26 @@ test('Sign in flow with mock', async ({ page }) => {
   })
 
   await page.goto(SERVICE_URL)
-  const usernameField = page.getByTestId('username-input')
-  await usernameField.fill('12345678')
-  const passwordField = page.getByTestId('password-input')
-  await passwordField.fill('qwertyui')
-  const signInButton = page.getByTestId('signIn-button')
-  await signInButton.click()
+  await loginPage.authorize('12345678','qwertyui');
   await expect(page.getByTestId('openStatusPopup-button')).toBeVisible()
 })
 
 test('Sign in flow with negative mock', async ({ page }) => {
+  const loginPage = new LoginPage(page);
   await page.route('**/login/student', async (route) => {
     await route.fulfill({
       status: 401,
     })
   })
-
   await page.goto(SERVICE_URL)
-  const usernameField = page.getByTestId('username-input')
-  await usernameField.fill('12345678')
-  const passwordField = page.getByTestId('password-input')
-  await passwordField.fill('qwertyui')
-  const signInButton = page.getByTestId('signIn-button')
-  await signInButton.click()
-  await expect(page.getByTestId('authorizationError-popup')).toBeVisible()
+  await loginPage.authorize('12345678','qwertyui');
+  await expect(loginPage.authorizationError).toBeVisible()
 })
 
 test('Sign in flow and create an order with mock', async ({ page }) => {
+  const loginPage = new LoginPage(page);
+  const orderPage = new OrderPage(page);
   const jwt = fakeJwt()
-
   await page.route('**/login/student', async (route) => {
     await route.fulfill({
       // body not a json but a plain text
@@ -68,31 +63,17 @@ test('Sign in flow and create an order with mock', async ({ page }) => {
   })
 
   await page.goto(SERVICE_URL)
-  const usernameField = page.getByTestId('username-input')
-  await usernameField.fill('12345678')
-  const passwordField = page.getByTestId('password-input')
-  await passwordField.fill('qwertyui')
-  const signInButton = page.getByTestId('signIn-button')
-  await signInButton.click()
+  await loginPage.authorize('12345678','qwertyui');
   await expect(page.getByTestId('openStatusPopup-button')).toBeVisible()
-  await page.getByTestId('username-input').click();
-  await page.getByTestId('username-input').fill('moh');
-  await page.getByTestId('username-input').press('Tab');
-  await page.getByTestId('phone-input').fill('33213');
-  await page.getByTestId('comment-input').click();
-  await page.getByTestId('comment-input').fill('123');
-  await page.locator('div').nth(1).click();
-  await page.getByTestId('phone-input').click();
-  await page.getByTestId('phone-input').fill('3321312');
-  await page.getByTestId('createOrder-button').click();
-  await expect (page.getByTestId('orderSuccessfullyCreated-popup-ok-button')).toBeVisible();
+  await orderPage.orderCreate('moh','3321312','123')
 });
 
 
 
 test('Sign in flow and get order by id with mock', async ({ page }) => {
   const jwt = fakeJwt()
-
+  const loginPage = new LoginPage(page);
+  const orderPage = new OrderPage(page);
   await page.route('**/login/student', async (route) => {
     await route.fulfill({
       // body not a json but a plain text
@@ -118,22 +99,15 @@ test('Sign in flow and get order by id with mock', async ({ page }) => {
   })
 
   await page.goto(SERVICE_URL)
-  const usernameField = page.getByTestId('username-input')
-  await usernameField.fill('12345678')
-  const passwordField = page.getByTestId('password-input')
-  await passwordField.fill('qwertyui')
-  const signInButton = page.getByTestId('signIn-button')
-  await signInButton.click()
-  await page.getByTestId('openStatusPopup-button').click();
-  await page.getByTestId('searchOrder-input').click();
-  await page.getByTestId('searchOrder-input').fill('888');
-  await page.getByTestId('searchOrder-submitButton').click();
- });
+  await loginPage.authorize('12345678','qwertyui');
+ await orderPage.searchOrder('888');
+   });
 
 
-test.only('Sign in flow and get accepted order by id with mock', async ({ page }) => {
+test('Sign in flow and get accepted order by id with mock', async ({ page }) => {
   const jwt = fakeJwt()
-
+  const loginPage = new LoginPage(page);
+  const orderPage = new OrderPage(page);
   await page.route('**/login/student', async (route) => {
     await route.fulfill({
       // body not a json but a plain text
@@ -159,14 +133,6 @@ test.only('Sign in flow and get accepted order by id with mock', async ({ page }
   })
 
   await page.goto(SERVICE_URL)
-  const usernameField = page.getByTestId('username-input')
-  await usernameField.fill('12345678')
-  const passwordField = page.getByTestId('password-input')
-  await passwordField.fill('qwertyui')
-  const signInButton = page.getByTestId('signIn-button')
-  await signInButton.click()
-  await page.getByTestId('openStatusPopup-button').click();
-  await page.getByTestId('searchOrder-input').click();
-  await page.getByTestId('searchOrder-input').fill('888');
-  await page.getByTestId('searchOrder-submitButton').click();
+  await loginPage.authorize('12345678','qwertyui');
+ await orderPage.searchOrder('888');
 });
