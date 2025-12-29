@@ -83,7 +83,7 @@ test('Sign in flow and get order by id with mock', async ({ page }) => {
     status: 'OPEN',
     courierId: null,
     customerName: 'Get mock order',
-    customerPhone: '5555551111',
+    customerPhone: '5555551110',
     comment: '32',
     id: 888,
   }
